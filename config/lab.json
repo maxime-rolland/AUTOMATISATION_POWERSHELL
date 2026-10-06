@@ -1,0 +1,12 @@
+{
+  "DomainName": "learn-it.local",
+  "DomainController": "dc01.learn-it.local",
+  "FileServer": "srv01.learn-it.local",
+  "AdminIPAddress": "10.77.10.30",
+  "LabId": "B01",
+  "DataRoot": "C:\\TP-Automatisation\\Partages",
+  "Services": [
+    "IT",
+    "RH"
+  ]
+}

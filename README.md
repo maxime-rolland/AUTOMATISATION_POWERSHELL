@@ -1,76 +1,86 @@
-# Automatisation Déploiement / PowerShell
+# TP — Automatiser l'arrivée d'utilisateurs avec PowerShell
 
-Support de TP complet pour un **Bachelor Réseau & Cybersécurité (Bac +3)**, sur **3 jours / 21 heures de présence** : 19 heures de travail et 2 heures de pauses.
+**Bachelor Réseau & Cybersécurité, Bac +3 · 2 jours · Domaine existant : `learn-it.local` · IA autorisée.**
 
-Tous les supports pédagogiques sont en **Markdown**. Les schémas sont en **Mermaid**, directement rendus par GitHub. Les scripts PowerShell et les données d'exercice sont conservés dans leurs formats exécutables : `.ps1`, `.psm1`, `.json`, `.csv` et `.html`.
+Vous devez rendre une maquette qui fonctionne : un fichier CSV devient des comptes AD, des groupes et des accès à des dossiers partagés. Une seule commande doit piloter les opérations, et une deuxième exécution doit conserver le résultat sans créer de doublons.
 
-## Accès aux supports
+Les exercices, explications et corrections sont disponibles ensemble. Lire, réutiliser et faire expliquer le corrigé par une IA est autorisé. La note porte sur le fonctionnement démontré, les tests et votre capacité à expliquer et adapter le script.
 
-| Public | Support |
+## Le résultat à montrer
+
+Avec les données fournies pour B01 : **six comptes, quatre groupes, deux partages**.
+
+- `tp.b01.alice` peut lire et écrire dans le partage IT, mais ne peut pas accéder à RH.
+- `tp.b01.chloe` peut lire et écrire dans RH, mais ne peut pas accéder à IT.
+- Le pilote déploie à partir du CSV ; les rapports sont lisibles.
+- Une relance crée **zéro nouveau compte** et conserve les accès.
+- Un CSV invalide est refusé avant les modifications ; une cible inaccessible produit une erreur compréhensible.
+
+## Parcours commun
+
+| Lecture | Contenu |
 |---|---|
-| Étudiants | [Support de TP complet](etudiant/Support_TP_Etudiant.md) |
-| Étudiants | [Mémo PowerShell et Server Core](etudiant/Memo_PowerShell_Core.md) |
-| Tous | [Maquette, flux et déploiement — Mermaid](Maquette.md) |
-| Formateur | [Guide, corrigés et conduite de séance](formateur/Guide_Formateur.md) |
-| Formateur | [Recette avant cours](formateur/RECETTE-AVANT-COURS.md) |
-| Formateur | [Grille d'évaluation](formateur/Grille_Evaluation.md) |
-| Tous | [Sources officielles](Sources.md) |
+| [01 — Maquette et mise en route](docs/01-Maquette-et-demarrage.md) | VM, domaine déjà présent, configuration et commandes de départ |
+| [02 — Comprendre PowerShell et faire un inventaire](docs/02-PowerShell-et-inventaire.md) | Objets, pipeline, paramètres, erreurs et sessions ; correction expliquée |
+| [03 — CSV vers Active Directory](docs/03-Automatiser-AD.md) | Validation complète, OU, comptes, groupes, WhatIf et relance |
+| [04 — Automatiser les partages et tester les droits](docs/04-Partages-et-tests.md) | SMB/NTFS, héritage, AGDLP, tests avec de vraies identités réseau |
+| [05 — Une commande pour tout déployer](docs/05-Pilotage-et-demonstration.md) | Orchestration, copies directes, rapports, erreurs et scénario de démonstration |
+| [Évaluation sur 20](EVALUATION.md) | Cinq critères de quatre points, preuves à montrer en direct |
+| [Travail avec l'IA](IA.md) | Méthode de travail autorisée et questions pour vérifier la compréhension |
+| [Mémo](docs/Memo.md) | Commandes utiles et diagnostic rapide |
 
-## Parcours
+Les [scripts commentés](scripts/README.md) sont les corrections exécutables. Les [données](donnees/) et la [configuration](config/lab.json) sont communes à tous les participants.
 
-| Jour | Objectifs et exercices |
-|---|---|
-| J1 | Objets et pipeline PowerShell, Server Core, réseau, AD DS/DNS, jointure au domaine, WinRM et inventaire distant |
-| J2 | Validation CSV, provisioning AD, idempotence, modèle AGDLP, partages SMB, ACL NTFS et tests d'accès positifs/négatifs |
-| J3 | IIS, publication de versions, vérification SHA256, rollback, tâche de santé, logs, incident et recette finale |
+## Organisation des deux jours
 
-Le parcours principal comporte **10 TP**. JEA, PowerShell 7 et tests de code sont des extensions pour les binômes en avance. Le moteur du socle est **Windows PowerShell 5.1** ; Server Core désigne le mode d'installation de Windows, pas la version de PowerShell.
+14 h de présence : **12 h 40 de travail et 1 h 20 de pauses** ; déjeuner exclu. L'installation des OS et la création du domaine sont des prérequis préparés avant le TP.
 
-## Maquette
+| Jour | Heure | Activité |
+|---|---|---|
+| J1 | 09:00–09:30 | Mission, résultat attendu et accès aux corrigés/IA |
+| J1 | 09:30–10:30 | Vérifier la maquette et adapter lab.json |
+| J1 | 10:30–10:50 | Pause |
+| J1 | 10:50–12:30 | Objets, pipeline, inventaire distant et première erreur gérée |
+| J1 | 13:30–15:20 | Valider le CSV et créer les objets AD |
+| J1 | 15:20–15:40 | Pause |
+| J1 | 15:40–16:40 | WhatIf, CSV invalide et deuxième passage AD |
+| J1 | 16:40–17:00 | Contrôle : six comptes, quatre groupes et aucune duplication |
+| J2 | 09:00–09:20 | Reprise et vérification des groupes |
+| J2 | 09:20–10:30 | Automatiser les dossiers, droits et partages |
+| J2 | 10:30–10:50 | Pause |
+| J2 | 10:50–12:30 | Tests réels Alice/Chloé et correction des accès |
+| J2 | 13:30–15:20 | Pilote, rapports, relance complète et panne contrôlée |
+| J2 | 15:20–15:40 | Pause |
+| J2 | 15:40–17:00 | Démonstrations, adaptation courte et explication individuelle |
 
-```mermaid
-flowchart TD
-  subgraph LAN["LAN isolé 10.77.10.0/24 — campus.test"]
-    ADM["ADM01 · 10.77.10.30 · administration Core"]
-    DC["DC01 · 10.77.10.10 · AD DS et DNS Core"]
-    SRV["SRV01 · 10.77.10.20 · SMB et IIS Core"]
-    ADM -->|"WinRM Kerberos et services de domaine"| DC
-    ADM -->|"WinRM 5985, SMB 445, HTTP 8080"| SRV
-    SRV -->|"DNS et services AD"| DC
-  end
+Pendant le dernier créneau, les binômes passent à tour de rôle ; les autres préparent leurs preuves. Prévoir environ 8 à 10 min par binôme et adapter le passage à l'effectif de la classe.
+
+## Démarrage rapide
+
+1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**.
+2. Copier ou cloner le dépôt dans `C:\TP-PowerShell` sur le poste d'administration.
+3. Adapter `config/lab.json` : vrais noms des serveurs, IP du poste de test et identifiant de binôme. Adapter les identifiants du CSV si le binôme n'est pas B01.
+4. Ouvrir **Windows PowerShell 5.1**. Pour démarrer avec le corrigé complet :
+
+```powershell
+Set-Location C:\TP-PowerShell
+$admin = Get-Credential -Message 'Compte autorisé sur le DC et le serveur de fichiers du TP'
+.\scripts\01-Get-Inventory.ps1 -Credential $admin
+.\scripts\04-Deploy-Lab.ps1 -Credential $admin -WhatIf
+$password = Read-Host 'Secret temporaire des comptes fictifs du TP' -AsSecureString
+.\scripts\04-Deploy-Lab.ps1 -Credential $admin -InitialPassword $password
 ```
 
-RAM : DC01 4 Go, SRV01 4 Go, ADM01 2 Go ; 2 vCPU et disque dynamique 60 Go par VM. Hôte recommandé avec 16 Go minimum, SSD et espace pour les checkpoints. DNS : 10.77.10.10 ; aucune passerelle dans le parcours hors ligne.
+Lire les explications avant de lancer le déploiement. Une réponse State=OK n'est pas toute la recette : montrer les accès avec les comptes métiers et la relance. Le secret est saisi, jamais enregistré dans le dépôt. Les comptes fictifs sont directement utilisables pour les tests SMB ; ce choix pédagogique et le secret temporaire commun ne constituent pas un onboarding de production.
 
-Voir la [maquette détaillée](Maquette.md) et le [JSON de configuration](commun/config/lab.json).
+## Binômes et domaine partagé
 
-## Préparer la séance
+`LabId=B01` produit une OU `TP-Automatisation-B01`, des comptes `tp.b01.*`, des groupes `GG_TP_B01_*`/`DL_TP_B01_*` et des partages `TP_B01_*`. B02 utilise son propre identifiant et des comptes `tp.b02.*`.
 
-1. Lire le [guide formateur](formateur/Guide_Formateur.md) et compléter la [recette avant cours](formateur/RECETTE-AVANT-COURS.md).
-2. Obtenir l'ISO Windows Server officielle ; installer les trois OS en **Standard Core, sans Desktop Experience**, avant les 21 h. Le dépôt ne contient ni ISO Windows, ni licence, ni VHDX/OVA préinstallé.
-3. Sous Hyper-V, utiliser les [scripts de préparation](commun/preparation/README.md). Pour les autres hyperviseurs, suivre le support et le guide.
-4. Copier le contenu de la racine du dépôt dans `C:\Lab` sur chaque VM ; le plan réseau et les chemins des scripts supposent cette structure.
-5. Démarrer J1 avec les VM au checkpoint S0-Core. Construire S1-Domaine puis S2-Acces au fil des TP.
+Un domaine peut être partagé par la classe ; affecter **un LabId unique à chaque binôme** et, de préférence, son propre serveur membre. Si les serveurs de fichiers sont aussi partagés, l'enseignant prépare les règles réseau communes ; les scripts de partages modifient les règles SMB locales du laboratoire. Ne pas lancer B01 depuis plusieurs binômes simultanément.
 
-Clonage sur le poste de préparation disposant de Git et d'Internet :
+## Livraison et validation
 
-```bash
-git clone https://github.com/maxime-rolland/AUTOMATISATION_POWERSHELL.git
-```
+Le dépôt contient les sources Markdown/Mermaid, scripts et jeux de données. Les essais Windows doivent être répétés sur la maquette réelle ; [VALIDATION.md](VALIDATION.md) distingue les contrôles effectués et les vérifications à exécuter. Le TP utilise le domaine existant : il ne le reconstruit pas et ne demande aucun rôle web ni service supplémentaire.
 
-Les fichiers sous `formateur/` contiennent les corrigés et sont consultables avec les droits d'accès du dépôt. Pour une distribution sans solutions, ne transmettre que `etudiant/`, `commun/`, `Maquette.md` et `Sources.md` ; conserver la même arborescence. Cette séparation est pédagogique, pas un contrôle d'accès GitHub.
-
-## Arborescence
-
-- [etudiant/](etudiant/README.md) : support complet, mémo et squelettes à compléter.
-- [commun/](commun/README.md) : configuration, données, releases, préparation VM et modèle de compte rendu.
-- [formateur/](formateur/README.md) : guide, scripts corrigés, grille et recette.
-- [Maquette.md](Maquette.md) : diagrammes Mermaid et tables techniques.
-- [CONTROLE.md](CONTROLE.md) : contrôles de cohérence et limites de validation.
-- [manifest.json](manifest.json) : taille et SHA256 des fichiers, hors manifeste lui-même et LICENSE existante.
-
-## État de validation
-
-Les liens internes, données, manifestes applicatifs, horaires et encodages des scripts ont été contrôlés. La syntaxe native Windows PowerShell 5.1 et les essais Windows AD/SMB/IIS/WinRM/JEA restent à exécuter sur la maquette de salle. Le guide contient la procédure ; le dépôt ne prétend pas fournir une recette Windows déjà exécutée.
-
-Auteur : Maxime ROLLAND · Pulse myIT. Version 1.1 — 6 octobre 2026. Licence : [MIT](LICENSE).
+Auteur : Maxime ROLLAND · Pulse myIT. Version 2.0 — 6 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).
