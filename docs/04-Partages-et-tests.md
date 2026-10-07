@@ -85,11 +85,22 @@ Alice est membre du GG ; le GG est membre du DL ; l'ACL autorise le DL. On crée
 | New-SmbShare si absent | Créer un partage, sans multiplier les noms à la relance |
 | Revoke/Unblock puis Grant | Revenir à la seule autorisation SMB prévue, même après une dérive |
 | EncryptData | Exiger le chiffrement SMB pour ces partages |
-| Règle réseau TP-Auto-SMB | Autoriser le poste de test sans couper Windows Firewall |
+| Règle réseau TP-Auto-SMB | Autoriser SMB depuis le seul poste de test, sans couper Windows Firewall |
+| Autres règles TCP 445 désactivées | Repérées par leur port, pas par leur nom, car leurs noms varient |
 
 Si un partage homonyme pointe vers un autre chemin, le script s'arrête au lieu de le détourner. La correction réapplique les ACL du dossier racine métier ; elle ne prétend pas nettoyer toutes les permissions explicites ajoutées manuellement à chaque fichier enfant. La liste de partage, elle, converge vers l'état prévu.
 
-Sur le serveur réservé à votre copie de la maquette, les règles SMB Windows générales sont désactivées au profit de la règle du TP. Une autre règle/GPO peut également autoriser 445. Ajouter une règle Allow ne prouve pas à elle seule qu'il n'existe aucun autre accès possible. Le test d'isolation métier repose aussi sur les ACL.
+Sur le serveur réservé à votre copie de la maquette, toute autre règle entrante locale qui autorise TCP 445 est désactivée au profit de la règle du TP. Le script les cherche par leur port : sous Windows Server 2022, la règle « File and Printer Sharing (SMB-In) » du profil Domaine porte un nom GUID, et « File Server Remote Management (SMB-In) » ouvre aussi 445. Un filtre sur le nom `FPS-SMB-In-TCP` les manquerait toutes deux. Une règle imposée par GPO peut encore primer. Ajouter une règle Allow ne prouve pas à elle seule qu'il n'existe aucun autre accès possible : vérifiez la liste réelle, puis le refus depuis une autre machine.
+
+```powershell
+# SRV01, ou Invoke-Command -Session $srv : règles entrantes actives qui ouvrent TCP 445.
+# Attendu après le script : TP-Auto-SMB seule, limitée à l'adresse du poste ADMIN.
+Get-NetFirewallPortFilter -Protocol TCP | Where-Object {'445' -in @($_.LocalPort)} |
+    Get-NetFirewallRule | Where-Object {$_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound'} |
+    Select-Object Name, DisplayName, @{n='Remote';e={($_ | Get-NetFirewallAddressFilter).RemoteAddress}}
+```
+
+Le test d'isolation métier repose aussi sur les ACL.
 
 ## Appel séparé, depuis ADMIN
 
@@ -169,7 +180,8 @@ $netbios = $domain.NetBIOSName
 # Ouvrir une NOUVELLE console ; ses accès réseau utiliseront le compte ordinaire Alice.
 # /netonly conserve l'identité locale, donc whoami ne devient pas tp.alice.
 # Saisir le secret temporaire commun quand runas le demande.
-runas /netonly "/user:$netbios\tp.alice" "powershell.exe -NoProfile"
+# -ExecutionPolicy : la nouvelle console n'hérite pas d'une stratégie de portée Process.
+runas /netonly "/user:$netbios\tp.alice" "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned"
 ```
 
 Saisir le secret temporaire des comptes fictifs lorsque runas le demande. Dans la **nouvelle** console :
@@ -191,7 +203,7 @@ Fermer la console d'Alice. Dans la console administrative d'origine, ouvrir cell
 ```powershell
 # ADMIN, console d'origine : réutiliser le vrai NetBIOS lu sur DC01.
 # Cette nouvelle console utilisera Chloé pour les connexions réseau, avec le même secret de TP.
-runas /netonly "/user:$netbios\tp.chloe" "powershell.exe -NoProfile"
+runas /netonly "/user:$netbios\tp.chloe" "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned"
 ```
 
 Puis exécuter dans la **nouvelle console de Chloé** :

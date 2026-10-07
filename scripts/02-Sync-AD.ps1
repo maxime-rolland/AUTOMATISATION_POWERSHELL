@@ -113,7 +113,8 @@ foreach ($row in $rows) {
         if (-not $created.Enabled) {throw "Création incomplète de $($row.SamAccountName) : vérifier la politique de mot de passe."}
         $state = 'CREE'
     }
-    if ($WhatIfPreference) {$state = 'PLANIFIE'} else {
+    # En dry run, seul un compte absent est PLANIFIE ; un compte déjà présent reste EXISTANT.
+    if ($WhatIfPreference) {if (-not $user) {$state = 'PLANIFIE'}} else {
         $groupName = "GG_TP_$($row.Service)"
         $members = @(Get-ADGroupMember $groupName | Select-Object -ExpandProperty SamAccountName)
         if ($row.SamAccountName -notin $members -and $PSCmdlet.ShouldProcess($groupName, "Ajouter $($row.SamAccountName)")) {

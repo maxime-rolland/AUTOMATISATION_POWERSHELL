@@ -1,6 +1,6 @@
 # Évaluation simple — 20 points
 
-[Accueil](README.md) · [Déroulé de démonstration](docs/05-Pilotage-et-demonstration.md) · [Grille CSV](evaluation.csv)
+[Accueil](README.md) · [Déroulé de démonstration](docs/05-Pilotage-et-demonstration.md)
 
 **IA et corrigés autorisés.** La note dépend du résultat démontré et de la compréhension. Chaque critère vaut de 0 à 4 points. Les preuves se font sur la copie isolée de la maquette, avec ses vrais objets. Le même TP et les mêmes résultats sont attendus de toute la classe.
 

@@ -83,15 +83,26 @@ foreach ($plan in $plans) {
 }
 
 $ruleName = 'TP-Auto-SMB'
-if ($PSCmdlet.ShouldProcess($ruleName, 'Autoriser SMB depuis le poste de test')) {
-    # Les règles SMB Windows générales sont retirées sur ce serveur DÉDIÉ au TP.
-    # Cela ne constitue pas une politique globale : d'autres règles/GPO peuvent autoriser 445.
-    Get-NetFirewallRule -Name 'FPS-SMB-In-TCP*' -ErrorAction SilentlyContinue | Disable-NetFirewallRule
+if ($PSCmdlet.ShouldProcess($ruleName, 'Réserver SMB au seul poste de test')) {
     if (-not (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)) {
         New-NetFirewallRule -Name $ruleName -DisplayName 'TP automatisation SMB' `
             -Direction Inbound -Protocol TCP -LocalPort 445 -RemoteAddress $config.AdminIPAddress `
             -Action Allow | Out-Null
     } else {
         Set-NetFirewallRule -Name $ruleName -RemoteAddress $config.AdminIPAddress -Enabled True
+    }
+
+    # Sur ce serveur DÉDIÉ au TP, toute autre règle locale qui ouvre TCP 445 est désactivée.
+    # On la repère par son port, pas par son nom : Windows Server 2022 nomme par un GUID la règle
+    # « File and Printer Sharing (SMB-In) » du profil Domaine, et « File Server Remote
+    # Management (SMB-In) » ouvre aussi 445. Une règle imposée par GPO peut encore primer.
+    $others = @(Get-NetFirewallPortFilter -Protocol TCP |
+        Where-Object {'445' -in @($_.LocalPort)} |
+        Get-NetFirewallRule |
+        Where-Object {$_.Name -ne $ruleName -and $_.Enabled -eq 'True' -and
+            $_.Direction -eq 'Inbound' -and $_.Action -eq 'Allow'})
+    foreach ($rule in $others) {
+        Write-Verbose "Règle désactivée : $($rule.DisplayName) ($($rule.Name))"
+        $rule | Disable-NetFirewallRule
     }
 }

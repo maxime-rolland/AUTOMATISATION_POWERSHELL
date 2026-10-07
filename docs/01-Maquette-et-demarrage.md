@@ -31,9 +31,9 @@ flowchart TD
 
 Vos trois VM doivent être disponibles au démarrage : Windows est installé, DC01 héberge déjà le domaine et les deux autres machines en sont membres. Si ces conditions ne sont pas remplies, terminez ces prérequis avant de commencer l'automatisation ; les commandes du TP ne créent pas le domaine.
 
-**Conservez le plan IP et les noms de votre laboratoire.** Pour une maquette utilisant les valeurs du dépôt : DC01 10.77.10.10, SRV01 10.77.10.20, ADMIN 10.77.10.30 sur un LAN isolé /24 ; les membres utilisent DC01 comme DNS. Une passerelle n'est utile que si votre réseau de laboratoire en prévoit une.
+**Conservez le plan IP et les noms de votre laboratoire.** Pour une maquette utilisant les valeurs du dépôt : DC01 10.77.10.10, SRV01 10.77.10.20, ADMIN 10.77.10.30 sur un LAN isolé /24 ; les membres utilisent DC01 comme DNS. Déclarez une passerelle par défaut, même si aucun routeur ne lui répond, par exemple 10.77.10.254 : sans passerelle, Windows classe le LAN en « Réseau non identifié » et applique le profil pare-feu Public au lieu du profil Domaine. `Get-NetConnectionProfile` doit afficher `DomainAuthenticated` sur les membres.
 
-Vérifiez les ressources allouées à votre copie : DC 2 vCPU/4 Go/60 Go ; serveur membre 2 vCPU/4 Go/60 Go ; poste admin Core 2 vCPU/2 Go/60 Go ou poste déjà existant. Vous pouvez utiliser Proxmox, Hyper-V ou VMware ; les scripts s'exécutent dans Windows et ne dépendent pas de l'hyperviseur.
+Vérifiez les ressources allouées à votre copie : DC 2 vCPU/4 Go/60 Go ; serveur membre 2 vCPU/4 Go/60 Go ; poste admin Core 2 vCPU/2 Go/60 Go, ou Windows 11 2 vCPU/4 Go/64 Go avec TPM 2.0 et démarrage sécurisé UEFI, ou poste déjà existant. Server Core fonctionne aussi avec 2 Go par serveur. Vous pouvez utiliser Proxmox, Hyper-V, VMware ou KVM/libvirt ; les scripts s'exécutent dans Windows et ne dépendent pas de l'hyperviseur. Pour KVM, le dossier [kvm](../kvm/README.md) construit automatiquement les trois VM, le domaine et l'instantané initial.
 
 ## Configuration : le fichier que vous devez adapter
 
@@ -115,7 +115,7 @@ Ce test valide le passage TCP, pas encore votre authentification. À l'étape 02
 
 ## Emplacement des fichiers et moteur
 
-Cloner sur le poste ADMIN disposant de Git, ou copier le dossier téléchargé :
+Cloner sur le poste ADMIN disposant de Git, ou copier le dossier fourni. Sur un LAN isolé sans Internet, le dépôt est souvent remis sur un DVD virtuel : copiez-le avec `robocopy D:\ C:\TP-PowerShell /E /A-:R`, en remplaçant D: par la lettre du lecteur. `/A-:R` retire l'attribut lecture seule que portent les fichiers d'un DVD ; sans lui, vous ne pourriez pas modifier le CSV.
 
 ```powershell
 # ADMIN : télécharger le dépôt si Git est installé ; sinon copier le dossier fourni.
@@ -132,7 +132,7 @@ Get-Content .\config\lab.json -Raw | ConvertFrom-Json
 Get-ExecutionPolicy -List
 ```
 
-Si les scripts locaux vérifiés sont bloqués, appliquer la règle de la salle ; éventuellement `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`. Une GPO peut primer. Après inspection, `Get-ChildItem .\scripts -Filter *.ps1 | Unblock-File` peut retirer le marquage Internet. Ces commandes ne remplacent pas la lecture du code.
+Si les scripts locaux vérifiés sont bloqués, appliquer la règle de la salle. Windows 11 est en `Restricted` par défaut ; Windows Server est en `RemoteSigned`. Sur un poste Windows 11, `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` autorise les scripts locaux de votre compte, y compris dans les consoles `runas /netonly` de l'étape 04, qui fonctionnent avec ce même compte local. La portée `Process` ne vaut que pour la console courante. Une GPO peut primer. Après inspection, `Get-ChildItem .\scripts -Filter *.ps1 | Unblock-File` peut retirer le marquage Internet. Ces commandes ne remplacent pas la lecture du code.
 
 Le moteur retenu est **Windows PowerShell 5.1 (`powershell.exe`)**. Les corrections utilisent les modules natifs Windows/AD ; elles ne nécessitent pas de téléchargement de module pendant la séance. Server Core est un mode d'installation de Windows, indépendant de la version de PowerShell. Les scripts fournis sont en UTF-8 avec BOM pour conserver les accents en 5.1.
 

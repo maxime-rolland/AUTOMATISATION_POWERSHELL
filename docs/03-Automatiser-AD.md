@@ -93,7 +93,7 @@ Une validation d'entrée préalable n'est pas une transaction AD. Une panne pend
 
 `SupportsShouldProcess` expose WhatIf au script. Chaque mutation doit passer par `$PSCmdlet.ShouldProcess(...)`. Ajouter simplement le mot WhatIf dans le nom d'un paramètre ne suffit pas.
 
-En dry run, les groupes prévus n'existent pas encore forcément : la correction ne tente pas de lire leurs membres comme s'ils étaient déjà créés. Elle décrit le plan. Le pilote de l'étape 05 fait son propre plan après validation des données et des connexions ; il ne copie pas les scripts dans ce mode.
+En dry run, les groupes prévus n'existent pas encore forcément : la correction ne tente pas de lire leurs membres comme s'ils étaient déjà créés. Elle décrit le plan : un compte absent apparaît `PLANIFIE`, un compte déjà présent `EXISTANT`. Le pilote de l'étape 05 fait son propre plan après validation des données et des connexions ; il ne copie pas les scripts dans ce mode. Attention aux cmdlets qui supportent elles aussi WhatIf : dans un script lancé avec `-WhatIf`, `Remove-PSSession` se contenterait d'annoncer la fermeture. Le pilote appelle donc `Remove-PSSession ... -WhatIf:$false` dans son bloc `finally`.
 
 Le paramètre InitialPassword est un SecureString saisi avec Read-Host. Pour la maquette fictive, un secret temporaire commun et `ChangePasswordAtLogon=false` permettent les essais SMB immédiats. En entreprise, prévoir des secrets individuels et un canal de remise adapté. Ne pas faire de ces valeurs de laboratoire une politique d'identité. Ne jamais exporter le mot de passe dans les preuves ou le CSV.
 

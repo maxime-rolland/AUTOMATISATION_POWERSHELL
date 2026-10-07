@@ -101,6 +101,8 @@ try {
     # On ne promet pas de transaction : rétablir la cause puis relancer le même jeu.
     throw "Automatisation interrompue : $($_.Exception.Message)"
 } finally {
-    if ($dcSession) {Remove-PSSession $dcSession}
-    if ($fileSession) {Remove-PSSession $fileSession}
+    # Remove-PSSession respecte aussi -WhatIf : sans -WhatIf:$false, un dry run se contenterait
+    # d'annoncer la fermeture et laisserait les deux sessions ouvertes dans la console.
+    if ($dcSession) {Remove-PSSession $dcSession -WhatIf:$false}
+    if ($fileSession) {Remove-PSSession $fileSession -WhatIf:$false}
 }

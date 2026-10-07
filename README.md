@@ -31,12 +31,13 @@ Avec le même jeu de données pour toute la classe : **six comptes, quatre group
 | [Évaluation sur 20](EVALUATION.md) | Cinq critères de quatre points, preuves à montrer en direct |
 | [Travail avec l'IA](IA.md) | Méthode de travail autorisée et questions pour vérifier la compréhension |
 | [Mémo](docs/Memo.md) | Commandes utiles et diagnostic rapide |
+| [Maquette KVM (enseignant)](kvm/README.md) | Construire DC01, SRV01 et ADMIN sous KVM/libvirt, instantané initial et recette du corrigé |
 
 Les [scripts commentés](scripts/README.md) sont les corrections exécutables. Les [données](donnees/) et la [configuration](config/lab.json) sont communes à tous les participants.
 
 ## Démarrage rapide
 
-1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**.
+1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**. Sous KVM/libvirt, [kvm/lab.sh](kvm/README.md) construit cette maquette.
 2. Copier ou cloner le dépôt dans `C:\TP-PowerShell` sur le poste d'administration.
 3. Vérifier `config/lab.json` : noms des deux serveurs et IP du poste de test. Le CSV, les noms des comptes et les exercices sont les mêmes pour toute la classe.
 4. Effectuer les vérifications DNS/WinRM de l'étape 01 et le contrôle syntaxique de [VALIDATION.md](VALIDATION.md).
@@ -47,7 +48,8 @@ Les [scripts commentés](scripts/README.md) sont les corrections exécutables. L
 Set-Location C:\TP-PowerShell
 
 # Demander le compte administratif ; Get-Credential renvoie un objet PSCredential.
-# Utiliser le vrai nom NetBIOS du domaine ou un UPN, par exemple administrateur@learn-it.local.
+# Utiliser le vrai nom NetBIOS du domaine ou un UPN. Le nom du compte intégré dépend de la langue
+# du DC : Administrator@learn-it.local sur un serveur anglais, administrateur@... sur un serveur français.
 $admin = Get-Credential -Message 'Compte autorisé sur le DC et le serveur de fichiers du TP'
 
 # Lire les informations des deux serveurs et produire resultats\inventaire.csv.
@@ -77,4 +79,4 @@ Vérifiez que le réseau virtuel de votre copie est isolé des autres : des VM p
 
 Le dépôt contient les sources Markdown/Mermaid, scripts et jeux de données. Les essais Windows doivent être répétés sur la maquette réelle ; [VALIDATION.md](VALIDATION.md) distingue les contrôles effectués et les vérifications à exécuter. Le TP utilise le domaine existant : il ne le reconstruit pas et ne demande aucun rôle web ni service supplémentaire.
 
-Auteur : Maxime ROLLAND · Pulse myIT. Version 2.2 — 7 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).
+Auteur : Maxime ROLLAND · Pulse myIT. Version 2.3 — 7 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).

@@ -170,7 +170,7 @@ Depuis ADMIN, dans la console administrative d'origine de l'étape 04 :
 ```powershell
 # $netbios contient le nom court réellement lu sur DC01 lors de l'étape des partages.
 # Ouvrir une nouvelle console dont les accès réseau utilisent Gabriel, compte ordinaire.
-runas /netonly "/user:$netbios\tp.gabriel" "powershell.exe -NoProfile"
+runas /netonly "/user:$netbios\tp.gabriel" "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned"
 ```
 
 Dans la **nouvelle console de Gabriel** :
