@@ -4,7 +4,7 @@
 
 Vous devez rendre une maquette qui fonctionne : un fichier CSV devient des comptes AD, des groupes et des accès à des dossiers partagés. Une seule commande doit piloter les opérations, et une deuxième exécution doit conserver le résultat sans créer de doublons.
 
-Les exercices, explications et corrections sont disponibles ensemble. Lire, réutiliser et faire expliquer le corrigé par une IA est autorisé. La note porte sur le fonctionnement démontré, les tests et votre capacité à expliquer et adapter le script.
+Les exercices, explications et corrections sont disponibles ensemble. Lire, réutiliser et faire expliquer le corrigé par une IA est autorisé voir recommandé. La note porte sur le fonctionnement démontré, les tests et votre capacité à expliquer et adapter le script.
 
 Suivez les étapes 01 à 05 dans l'ordre. Chaque consigne vous indique l'action à réaliser, la machine concernée et le résultat à vérifier. Vous utilisez le même support pour apprendre, consulter la correction et préparer votre démonstration.
 
