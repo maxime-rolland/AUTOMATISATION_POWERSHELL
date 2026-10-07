@@ -34,30 +34,6 @@ Avec le même jeu de données pour toute la classe : **six comptes, quatre group
 
 Les [scripts commentés](scripts/README.md) sont les corrections exécutables. Les [données](donnees/) et la [configuration](config/lab.json) sont communes à tous les participants.
 
-## Organisation des deux jours
-
-14 h de présence : **12 h 40 de travail et 1 h 20 de pauses** ; déjeuner exclu. L'installation des OS et la création du domaine sont des prérequis préparés avant le TP.
-
-| Jour | Heure | Activité |
-|---|---|---|
-| J1 | 09:00–09:30 | Mission, résultat attendu et accès aux corrigés/IA |
-| J1 | 09:30–10:30 | Vérifier la maquette et adapter lab.json |
-| J1 | 10:30–10:50 | Pause |
-| J1 | 10:50–12:30 | Objets, pipeline, inventaire distant et première erreur gérée |
-| J1 | 13:30–15:20 | Valider le CSV et créer les objets AD |
-| J1 | 15:20–15:40 | Pause |
-| J1 | 15:40–16:40 | WhatIf, CSV invalide et deuxième passage AD |
-| J1 | 16:40–17:00 | Contrôle : six comptes, quatre groupes et aucune duplication |
-| J2 | 09:00–09:20 | Reprise et vérification des groupes |
-| J2 | 09:20–10:30 | Automatiser les dossiers, droits et partages |
-| J2 | 10:30–10:50 | Pause |
-| J2 | 10:50–12:30 | Tests réels Alice/Chloé et correction des accès |
-| J2 | 13:30–15:20 | Pilote, rapports, relance complète et panne contrôlée |
-| J2 | 15:20–15:40 | Pause |
-| J2 | 15:40–17:00 | Démonstrations, adaptation courte et explication individuelle |
-
-Pendant le dernier créneau, préparez vos rapports et vos consoles de test, puis présentez votre maquette lors de votre passage. Votre démonstration dure environ 8 à 10 min ; son déroulé est détaillé à l'étape 05.
-
 ## Démarrage rapide
 
 1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**.
