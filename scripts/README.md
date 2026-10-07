@@ -14,3 +14,7 @@
 Moteur : Windows PowerShell 5.1 ; scripts UTF-8 avec BOM. Les commentaires expliquent les décisions et les effets ; ils ne dispensent pas de tester sur votre maquette. Le pilote appelle les scripts AD et partages : ne les lancer manuellement que pour comprendre ou diagnostiquer une étape.
 
 Le fichier de configuration et les données sont copiés sur les cibles dans `C:\TP-Automatisation\scripts`. Les corrections sont disponibles dès le début du TP. Réutilisation et IA autorisées ; explication et démonstration obligatoires.
+
+Pendant le parcours, gardez votre console administrative sur ADMIN et suivez les appels séparés des étapes 03/04 pour comprendre leurs effets. À l'étape 05, le pilote reprend ces mêmes opérations automatiquement ; il doit retrouver les objets existants. Utilisez le CSV initial jusqu'à la vérification du socle, puis le CSV à sept pour Gabriel et la démonstration finale.
+
+Les variables d'une console ne sont pas partagées avec une autre. Si vous fermez la console administrative, relisez le JSON dans `$config` et resaisissez `$admin` avec Get-Credential avant de reprendre. Saisissez le secret temporaire dans `$password` avec Read-Host -AsSecureString si nécessaire ; les comptes déjà présents conservent leur secret. Réservez les nouvelles consoles `runas /netonly` aux tests métiers.

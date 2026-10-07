@@ -6,6 +6,8 @@ Vous devez rendre une maquette qui fonctionne : un fichier CSV devient des compt
 
 Les exercices, explications et corrections sont disponibles ensemble. Lire, réutiliser et faire expliquer le corrigé par une IA est autorisé. La note porte sur le fonctionnement démontré, les tests et votre capacité à expliquer et adapter le script.
 
+Suivez les étapes 01 à 05 dans l'ordre. Chaque consigne vous indique l'action à réaliser, la machine concernée et le résultat à vérifier. Vous utilisez le même support pour apprendre, consulter la correction et préparer votre démonstration.
+
 ## Le résultat à montrer
 
 Avec le même jeu de données pour toute la classe : **six comptes, quatre groupes, deux partages**.
@@ -15,6 +17,7 @@ Avec le même jeu de données pour toute la classe : **six comptes, quatre group
 - Le pilote déploie à partir du CSV ; les rapports sont lisibles.
 - Une relance crée **zéro nouveau compte** et conserve les accès.
 - Un CSV invalide est refusé avant les modifications ; une cible inaccessible produit une erreur compréhensible.
+- Après validation de ce socle, vous ajoutez `tp.gabriel` : **sept comptes au total**, toujours quatre groupes et deux partages. Gabriel obtient les mêmes accès IT qu'Alice.
 
 ## Parcours commun
 
@@ -53,14 +56,15 @@ Les [scripts commentés](scripts/README.md) sont les corrections exécutables. L
 | J2 | 15:20–15:40 | Pause |
 | J2 | 15:40–17:00 | Démonstrations, adaptation courte et explication individuelle |
 
-Pendant le dernier créneau, les étudiants ou binômes passent à tour de rôle ; les autres préparent leurs preuves. Prévoir environ 8 à 10 min par maquette et adapter le passage à l'effectif de la classe.
+Pendant le dernier créneau, préparez vos rapports et vos consoles de test, puis présentez votre maquette lors de votre passage. Votre démonstration dure environ 8 à 10 min ; son déroulé est détaillé à l'étape 05.
 
 ## Démarrage rapide
 
 1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**.
 2. Copier ou cloner le dépôt dans `C:\TP-PowerShell` sur le poste d'administration.
 3. Vérifier `config/lab.json` : noms des deux serveurs et IP du poste de test. Le CSV, les noms des comptes et les exercices sont les mêmes pour toute la classe.
-4. Ouvrir **Windows PowerShell 5.1**. Pour démarrer avec le corrigé complet :
+4. Effectuer les vérifications DNS/WinRM de l'étape 01 et le contrôle syntaxique de [VALIDATION.md](VALIDATION.md).
+5. Ouvrir **Windows PowerShell 5.1**. Pour utiliser le corrigé complet après ces vérifications :
 
 ```powershell
 # ADMIN : placer la console à la racine du dépôt, pour les chemins relatifs .\scripts.
@@ -83,16 +87,18 @@ $password = Read-Host 'Secret temporaire des comptes fictifs du TP' -AsSecureStr
 .\scripts\04-Deploy-Lab.ps1 -Credential $admin -InitialPassword $password
 ```
 
-Lire les explications avant de lancer le déploiement. Une réponse State=OK n'est pas toute la recette : montrer les accès avec les comptes métiers et la relance. Le secret est saisi, jamais enregistré dans le dépôt. Les comptes fictifs sont directement utilisables pour les tests SMB ; ce choix pédagogique et le secret temporaire commun ne constituent pas un onboarding de production.
+Ce bloc est un raccourci vers la correction complète ; pour suivre le TP, découvrez d'abord l'inventaire, puis AD, puis les partages dans les étapes 02 à 04. Vous retrouverez ce déploiement global à l'étape 05. Si vous l'avez déjà exécuté, les exercices suivants retrouveront des objets existants : ne les supprimez pas pour forcer une nouvelle création.
+
+Une réponse State=OK confirme les opérations administratives ; démontrez aussi les accès avec les comptes métiers et la relance. Le secret est saisi, jamais enregistré dans le dépôt. Les comptes fictifs sont directement utilisables pour les tests SMB ; ce choix pédagogique et le secret temporaire commun ne constituent pas un onboarding de production.
 
 ## Un seul TP pour toute la classe
 
-Chaque étudiant, ou chaque binôme si le travail se fait à deux, reçoit **une copie isolée de la même maquette** : DC01, SRV01 et ADMIN dans `learn-it.local`. Tous utilisent `tp.alice`, `tp.chloe`, les groupes `GG_TP_IT`/`GG_TP_RH` et `DL_TP_IT_M`/`DL_TP_RH_M`, et les partages `TP_IT$`/`TP_RH$`. Il n'y a aucun identifiant de binôme à configurer.
+Vous travaillez seul ou à deux sur **une copie isolée de la même maquette** : DC01, SRV01 et ADMIN dans `learn-it.local`. Vous utilisez `tp.alice`, `tp.chloe`, les groupes `GG_TP_IT`/`GG_TP_RH` et `DL_TP_IT_M`/`DL_TP_RH_M`, et les partages `TP_IT$`/`TP_RH$`. Il n'y a aucun identifiant de binôme à configurer.
 
-Le réseau virtuel de chaque copie doit être isolé des autres : des VM portant les mêmes noms et IP ne doivent pas partager le même LAN. Le formateur fournit les VM prêtes et un point de restauration avant les créations du TP. Tous suivent les mêmes étapes, le même ajout final de `tp.gabriel` et la même grille d'évaluation.
+Vérifiez que le réseau virtuel de votre copie est isolé des autres : des VM portant les mêmes noms et IP ne doivent pas partager le même LAN. Avant les premières créations, assurez-vous de disposer de l'état initial des trois VM pour pouvoir reprendre une séance à zéro. Les étapes, l'ajout final de `tp.gabriel` et la grille d'évaluation sont identiques pour toute la classe.
 
 ## Livraison et validation
 
 Le dépôt contient les sources Markdown/Mermaid, scripts et jeux de données. Les essais Windows doivent être répétés sur la maquette réelle ; [VALIDATION.md](VALIDATION.md) distingue les contrôles effectués et les vérifications à exécuter. Le TP utilise le domaine existant : il ne le reconstruit pas et ne demande aucun rôle web ni service supplémentaire.
 
-Auteur : Maxime ROLLAND · Pulse myIT. Version 2.1 — 7 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).
+Auteur : Maxime ROLLAND · Pulse myIT. Version 2.2 — 7 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).

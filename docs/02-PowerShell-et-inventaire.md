@@ -4,6 +4,8 @@
 
 **Travail sur le poste ADMIN. Correction : [01-Get-Inventory.ps1](../scripts/01-Get-Inventory.ps1).**
 
+Ouvrez Windows PowerShell 5.1 sur ADMIN et placez-vous dans `C:\TP-PowerShell`, comme à la fin de l'étape 01. Exécutez les exemples dans cette même console ; les blocs suivants réutilisent les variables définies plus haut. Les sessions `$s` et `$session` sont des connexions vers les serveurs, pas de nouvelles consoles locales.
+
 ## Ce que vous allez construire
 
 Un script contacte les deux serveurs, relève leur OS, leur domaine et leur espace disque, puis produit un CSV. Une cible inaccessible doit apparaître en ECHEC sans faire disparaître les résultats des cibles qui répondent. Cette activité prépare les mêmes connexions que le pilote de déploiement utilisera ensuite. La correction fournie inclut aussi LastBootUpTime, l'enrichissement commun demandé plus bas.

@@ -4,6 +4,8 @@
 
 **Correction : [04-Deploy-Lab.ps1](../scripts/04-Deploy-Lab.ps1).**
 
+Commencez dans la console administrative d'origine d'ADMIN, après les tests Alice/Chloé de l'étape 04. À ce stade, six comptes, quatre groupes et deux partages existent déjà : le premier lancement du pilote doit les retrouver. Ne restaurez pas l'état initial entre les étapes.
+
 ## L'automatisation complète
 
 Les étapes précédentes vous ont fait copier et lancer les scripts pour comprendre leur contexte. Maintenant, le poste ADMIN doit effectuer ces opérations avec une seule commande. C'est le rôle du pilote : il ne réécrit pas toute la logique AD et ACL ; il coordonne les scripts spécialisés.
@@ -55,10 +57,12 @@ $admin = Get-Credential -Message 'Administration de la maquette'
 # Valider données et connexions, puis afficher le plan sans copier ni créer les ressources.
 .\scripts\04-Deploy-Lab.ps1 -Credential $admin -WhatIf
 
-# Saisir une seule fois le secret temporaire des comptes fictifs en SecureString.
+# Resaisir le même secret temporaire que celui attribué aux comptes à l'étape 03.
+# Les comptes existants gardent leur mot de passe : saisir un autre secret ne le remplace pas.
 $password = Read-Host 'Secret temporaire des comptes fictifs' -AsSecureString
 
-# Déployer réellement avec le CSV initial : six comptes, quatre groupes et deux partages.
+# Synchroniser le CSV initial : retrouver les six comptes et quatre groupes des étapes précédentes,
+# puis réappliquer la configuration des deux partages.
 .\scripts\04-Deploy-Lab.ps1 -Credential $admin -InitialPassword $password
 
 # Lire le bilan récent ; Created/Existing reflètent l'état trouvé lors de ce passage.
@@ -69,7 +73,7 @@ Import-Csv .\resultats\comptes.csv -Delimiter ';' -Encoding UTF8
 Import-Csv .\resultats\partages.csv -Delimiter ';' -Encoding UTF8
 ```
 
-Sur une maquette sans objets du TP, le résumé annonce Created=6, Existing=0, Shares=2. Si vous avez déjà fait l'étape AD séparément, il doit annoncer Created=0 et Existing=6 ; ce n'est pas une erreur. La vérité est l'état présent, pas un chiffre de démonstration obtenu en supprimant manuellement des comptes.
+En suivant les étapes du TP, le résumé doit annoncer Created=0, Existing=6 et Shares=2 : vous avez déjà créé les comptes à l'étape 03. Si vous utilisez directement le pilote sur une maquette sans objets du TP, il annonce Created=6, Existing=0 et Shares=2. La vérité est l'état présent ; conservez les comptes et expliquez les compteurs correspondant à votre passage.
 
 State=OK signifie que les étapes administratives du pilote sont terminées. Il reste à vérifier l'accès SMB avec les identités métiers : le pilote tourne en administrateur et ne peut donc pas conclure seul à l'isolation d'Alice.
 
@@ -183,20 +187,20 @@ Ce test prouve que la donnée supplémentaire a produit un compte et un accès f
 
 L'enrichissement de l'inventaire de l'étape 02 est également commun à tous : ajouter la propriété LastBootUpTime. Les objectifs et la grille restent identiques pour l'ensemble de la classe.
 
-## Démonstration devant l'enseignant : 8 à 10 min
+## Votre démonstration évaluée : 8 à 10 min
 
 1. **Contexte, 1 min :** montrer les noms des serveurs et le domaine learn-it.local.
-2. **Déploiement, 2 min :** lancer le pilote ; lire le rapport récent ; montrer les comptes/groupes et les deux partages. Si tout est déjà présent, conserver cet état et expliquer Existing.
-3. **Relance, 1 min :** rejouer et montrer zéro nouveau compte, puis vérifier le résultat présent.
+2. **Déploiement, 2 min :** lancer le pilote avec le CSV à sept personnes ; lire le rapport récent ; montrer les sept comptes, les quatre groupes et les deux partages. Garder les rapports des passages précédents pour expliquer le socle à six et l'ajout de Gabriel. Si tout est déjà présent, conserver cet état et expliquer Existing.
+3. **Relance, 1 min :** rejouer avec le même CSV à sept ; montrer Created=0, Existing=7 et Shares=2, puis vérifier le résultat présent.
 4. **Droits, 2 min :** Alice IT oui/RH non ; Chloé RH oui/IT non, dans leurs consoles réseau séparées.
-5. **Erreur et adaptation, 2 min :** montrer les deux erreurs préparées (CSV invalide et cible inaccessible), puis la création et les accès de Gabriel.
+5. **Erreur et adaptation, 2 min :** montrer les deux erreurs préparées (CSV invalide et cible inaccessible), puis le rapport de création de Gabriel, son appartenance et ses accès. Vous n'avez pas à supprimer puis recréer Gabriel pendant le passage.
 6. **Explication individuelle, 1 à 2 min :** chaque membre explique une partie choisie du script et la cause d'un résultat.
 
 Une maquette qui démarre mais dont les droits n'ont jamais été testés n'est pas une démonstration complète. Les scripts peuvent être ceux de la correction : vous devez comprendre leur rôle et leurs limites.
 
 ## Remise minimale
 
-- Scripts utilisés et fichiers JSON/CSV utilisés, sans secret.
+- Scripts et fichiers JSON/CSV utilisés, sans secret ; conserver le CSV initial et le CSV à sept personnes.
 - Résultats de déploiement/inventaire et quelques extraits d'erreur.
 - Un [bilan court](../BILAN.md) : état final, tests, une erreur résolue, usage de l'IA et limite identifiée.
 

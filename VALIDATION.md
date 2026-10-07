@@ -1,26 +1,23 @@
-# Validation et répétition sur la maquette
+# Vérifier votre maquette et préparer la démonstration
 
 [Accueil](README.md) · [Démonstration](docs/05-Pilotage-et-demonstration.md)
 
-## État de cette livraison
+Ce fichier rassemble vos points de contrôle. Utilisez-le au fil des étapes 01 à 05, puis pour répéter votre démonstration. Les contrôles de déploiement ne sont pas des prérequis à réaliser avant le TP : ils correspondent au travail que vous allez construire.
 
-Les sources, liens locaux, fichiers JSON/CSV, encodages et cohérence des deux journées ont été contrôlés. Les scripts ont été relus et commentés. Les essais **sur Windows et le domaine learn-it.local n'ont pas été exécutés dans l'environnement de création du dépôt** ; le fonctionnement doit être vérifié sur la maquette réelle, selon les étapes ci-dessous. Aucune preuve d'AD/SMB ne doit être inventée à partir de ces seuls contrôles de fichiers.
+## Vos contrôles au fil du TP
 
-La version 2.1 utilise les mêmes noms pour tous, sans identifiant de binôme. Les commandes des supports sont commentées directement dans les blocs. Le jeu initial contient six comptes ; l'adaptation commune ajoute Gabriel dans un CSV distinct. Vérifier d'abord le socle à six, puis le passage à sept et les accès de Gabriel.
+| Étape | Vérification | Résultat à constater |
+|---|---|---|
+| 01 | Contexte et WinRM | Vrais FQDN et IP du poste ; domaine existant ; copie isolée ; WinRM joignable sur les deux cibles |
+| 01, puis après vos modifications | Syntaxe des scripts | Aucun ParseError en Windows PowerShell 5.1 |
+| 02 | Accès administratifs et inventaire | Sessions Kerberos ; données des deux vraies cibles en OK ; cible fictive en ECHEC ; date de démarrage dans le CSV |
+| 03 | Données et AD | CSV invalide refusé avant création ; six comptes, quatre groupes et bonnes appartenances |
+| 04 | Partages et droits | Deux partages ; Alice IT oui/RH non et Chloé RH oui/IT non |
+| 05, avant Gabriel | Pilote et relance | Six comptes conservés ; zéro ajout lors de la relance ; mêmes groupes, partages et accès |
+| 05 | Deux erreurs et reprise | CSV invalide et cible inaccessible signalés ; pas d'ajout ; relance normale réussie |
+| 05, après Gabriel | Adaptation et état final | Sept comptes ; quatre membres dans GG_TP_IT ; mêmes quatre groupes/deux partages ; Gabriel IT oui/RH non ; relance Created=0 et Existing=7 |
 
-## Avant le cours : sept vérifications
-
-| Vérification | Résultat à constater |
-|---|---|
-| Contexte | Vrais FQDN et IP du poste ; domaine existant ; copie de maquette isolée |
-| Accès administratifs | Sessions Kerberos vers les deux cibles ; AD sur le DC ; admin du serveur membre |
-| Syntaxe des scripts | Aucun ParseError en Windows PowerShell 5.1 |
-| Données | CSV valide lu ; CSV invalide refusé avant déploiement |
-| Déploiement | Six comptes, quatre groupes, deux partages avec le jeu initial |
-| Relance | Zéro compte ajouté, mêmes groupes et partages |
-| Droits | Alice IT oui/RH non et Chloé RH oui/IT non, avec de bonnes identités réseau |
-
-Puis effectuer le scénario d'erreur et la petite adaptation de la démonstration. Noter les versions Windows utilisées et l'erreur réelle si un point échoue.
+Notez les versions Windows utilisées, conservez les rapports des passages à six puis à sept comptes et gardez l'erreur réelle si un point échoue. Préparez les consoles métiers avant votre passage pour limiter les manipulations pendant la démonstration.
 
 ## Contrôle syntaxique non exécutant
 
@@ -49,7 +46,7 @@ Get-ChildItem .\scripts -Filter *.ps1 | ForEach-Object {
 if ($failed) {throw 'Corriger la syntaxe avant de déployer.'}
 ```
 
-Ce parseur ne lance aucune création. Il valide la syntaxe, pas les droits, les modules disponibles ou le fonctionnement AD/SMB. Il faut ensuite faire la répétition réelle.
+Ce parseur ne lance aucune création. Il valide la syntaxe, pas les droits, les modules disponibles ou le fonctionnement AD/SMB. Poursuivez ensuite avec les contrôles réels des étapes du TP.
 
 ## Trace courte de répétition
 
@@ -57,4 +54,8 @@ Date : … · Machines et versions : … · Copie de maquette : …
 
 Syntaxe : … · CSV : … · Déploiement : … · Relance : … · Droits : … · Erreur/adaptation : …
 
-Correction nécessaire avant distribution : …
+Correction à apporter puis contrôle à rejouer : …
+
+## Contrôles déjà effectués sur les sources
+
+Les fichiers Markdown, liens locaux, JSON/CSV, encodages et cohérence du parcours ont été contrôlés. Les scripts ont été relus et commentés. Les essais **sur Windows et le domaine learn-it.local n'ont pas été exécutés dans l'environnement de création du dépôt** : vos tests sur les VM doivent établir le fonctionnement réel AD/SMB. Distinguez ces tests des seuls contrôles de fichiers.

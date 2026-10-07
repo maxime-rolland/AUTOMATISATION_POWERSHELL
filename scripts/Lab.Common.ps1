@@ -16,7 +16,7 @@ function Read-LabConfig {
     # Une erreur de lecture doit interrompre le traitement, pas produire un objet vide.
     $config = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop | ConvertFrom-Json
 
-    # Le TP cible le domaine donné par l'enseignant. Il ne crée aucune forêt.
+    # Le TP cible le domaine existant learn-it.local. Il ne crée aucune forêt.
     if ($config.DomainName -ne 'learn-it.local') {
         throw 'Ce TP doit être exécuté dans learn-it.local.'
     }

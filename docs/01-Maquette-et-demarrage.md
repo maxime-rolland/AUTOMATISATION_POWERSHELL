@@ -8,6 +8,8 @@ L'entreprise fictive du TP accueille six personnes, réparties entre IT et RH. A
 
 Votre travail consiste à transformer ce processus en une suite contrôlée : **lire des données, les valider, appliquer les changements nécessaires et vérifier les résultats**. L'objet étudié est cette automatisation. Le domaine existe déjà ; sa création et l'installation des OS ne font pas partie du temps d'exercice.
 
+Dans cette première étape, vous vérifiez vos VM, vous activez leur administration à distance et vous renseignez la configuration utilisée par vos scripts. Exécutez les commandes dans l'ordre indiqué ; le nom de la machine et le type de console sont précisés avant chaque bloc.
+
 ## Machines nécessaires
 
 ```mermaid
@@ -23,13 +25,15 @@ flowchart TD
 
 | Machine | Situation avant le TP | Rôle pendant le TP |
 |---|---|---|
-| DC01, nom adaptable | DC existant de learn-it.local, DNS fonctionnel | Exécuter les commandes ActiveDirectory |
+| DC01, nom adaptable | Windows Server, de préférence Core ; DC existant de learn-it.local, DNS fonctionnel | Exécuter les commandes ActiveDirectory |
 | SRV01, nom adaptable | Windows Server Core membre du domaine | Héberger les dossiers/partages du TP |
 | Poste ADMIN | Windows membre du domaine, PowerShell 5.1 | Écrire, piloter et tester ; Windows 11 ou Server Core |
 
-Si le laboratoire existe, **conserver son plan IP et ses noms**. Ne pas changer l'adressage pour suivre les valeurs d'exemple. Si le formateur doit préparer une maquette neuve : DC01 10.77.10.10, SRV01 10.77.10.20, ADMIN 10.77.10.30 sur un LAN isolé /24 ; DNS des membres vers DC01. Une passerelle n'est utile que si le réseau du laboratoire en prévoit une.
+Vos trois VM doivent être disponibles au démarrage : Windows est installé, DC01 héberge déjà le domaine et les deux autres machines en sont membres. Si ces conditions ne sont pas remplies, terminez ces prérequis avant de commencer l'automatisation ; les commandes du TP ne créent pas le domaine.
 
-Profil confortable pour une maquette entièrement virtualisée : DC 2 vCPU/4 Go/60 Go ; serveur membre 2 vCPU/4 Go/60 Go ; poste admin Core 2 vCPU/2 Go/60 Go ou poste déjà existant. Sous Proxmox, Hyper-V ou VMware, le formateur fournit le réseau et les OS déjà prêts. Aucun hyperviseur particulier n'est nécessaire à l'exécution des scripts.
+**Conservez le plan IP et les noms de votre laboratoire.** Pour une maquette utilisant les valeurs du dépôt : DC01 10.77.10.10, SRV01 10.77.10.20, ADMIN 10.77.10.30 sur un LAN isolé /24 ; les membres utilisent DC01 comme DNS. Une passerelle n'est utile que si votre réseau de laboratoire en prévoit une.
+
+Vérifiez les ressources allouées à votre copie : DC 2 vCPU/4 Go/60 Go ; serveur membre 2 vCPU/4 Go/60 Go ; poste admin Core 2 vCPU/2 Go/60 Go ou poste déjà existant. Vous pouvez utiliser Proxmox, Hyper-V ou VMware ; les scripts s'exécutent dans Windows et ne dépendent pas de l'hyperviseur.
 
 ## Configuration : le fichier que vous devez adapter
 
@@ -50,9 +54,9 @@ Le nom DNS `learn-it.local` ne permet pas de deviner le nom court NetBIOS. Le sc
 
 Le TP est identique pour tous : mêmes noms de VM, même domaine, même CSV et mêmes objets AD/SMB. Les noms recommandés sont DC01, SRV01 et ADMIN ; si les VM fournies portent déjà d'autres noms, seuls les FQDN et l'IP de test du JSON sont à vérifier.
 
-Chaque étudiant ou binôme travaille sur sa **propre copie du domaine et des VM**, reliées à un LAN virtuel isolé des autres copies. Le formateur duplique une maquette préparée avant le cours ; il ne relie pas les copies entre elles. Cela permet de conserver les mêmes noms et adresses partout sans collision. Un réseau isolé Hyper-V, un LAN interne VMware ou un réseau Proxmox séparé convient ; la préparation de l'hyperviseur reste hors des deux jours de TP.
+Vous travaillez, seul ou à deux, sur votre **propre copie du domaine et des trois VM**, reliées à un LAN virtuel isolé des autres copies. Vérifiez à quel réseau virtuel chaque carte est connectée : les trois VM de votre copie doivent communiquer entre elles, sans rejoindre le LAN des autres maquettes. Cette isolation permet de conserver les mêmes noms et adresses partout sans collision. La création du réseau virtuel fait partie des prérequis.
 
-Avant la distribution, arrêter proprement les trois VM et conserver une copie ou un point de restauration cohérent de cet état préparé. Le socle ne contient encore ni l'OU `TP-Automatisation`, ni les comptes `tp.*`, ni les partages `TP_IT$`/`TP_RH$`.
+Avant vos premières créations, vérifiez que vous disposez d'une sauvegarde ou d'un point de restauration cohérent des trois VM, pris dans leur état initial. Si vous devez le constituer, arrêtez proprement les trois VM, sauvegardez cet ensemble, puis redémarrez-les. Cet état initial ne contient encore ni l'OU `TP-Automatisation`, ni les comptes `tp.*`, ni les partages `TP_IT$`/`TP_RH$`.
 
 ## Contrôle de départ, sur ADMIN
 
@@ -76,24 +80,38 @@ Resolve-DnsName srv01.learn-it.local
 
 # Ce type SRV demande le service LDAP des DC, pas l'adresse d'un poste.
 Resolve-DnsName '_ldap._tcp.dc._msdcs.learn-it.local' -Type SRV
+```
 
-# Tester le port WinRM des deux cibles ; TcpTestSucceeded doit être True.
-# Ce test prouve la connectivité TCP ; l'authentification sera testée à l'étape 02.
+Utilisez les noms réels de vos serveurs s'ils diffèrent des exemples. Vérifiez que le poste est membre du domaine et que les FQDN résolvent vers les bonnes IP. Corrigez un problème de DNS avant de passer aux connexions distantes.
+
+## Activer l'administration à distance sur DC01 et SRV01
+
+Ouvrez la **console de la VM DC01**, connectez-vous avec le compte d'administration du laboratoire et ouvrez Windows PowerShell avec les droits administrateur. Sur Server Core, saisissez `powershell.exe` si vous êtes dans l'invite de commandes. Exécutez le bloc suivant, puis faites la même chose dans la **console de SRV01**.
+
+Cette opération permet ensuite au poste ADMIN d'envoyer des commandes PowerShell aux serveurs. Vous la réalisez depuis leurs consoles locales, car la connexion distante que vous préparez peut ne pas être encore disponible.
+
+```powershell
+# Sur DC01 puis SRV01, en console Windows PowerShell administrateur.
+# Activer WinRM et les points d'entrée PowerShell nécessaires aux sessions distantes.
+# -Force supprime les demandes de confirmation ; la commande configure aussi les règles associées.
+Enable-PSRemoting -Force
+
+# Vérifier que le service qui reçoit les connexions distantes est démarré : Status = Running.
+Get-Service WinRM
+```
+
+Revenez maintenant sur **ADMIN** et testez le port utilisé :
+
+```powershell
+# ADMIN : vérifier la connectivité vers WinRM après son activation sur les deux serveurs.
+# Adapter les noms uniquement si vos VM portent d'autres noms DNS.
 Test-NetConnection dc01.learn-it.local -Port 5985
 Test-NetConnection srv01.learn-it.local -Port 5985
 ```
 
-Remplacer les noms de serveur par ceux du JSON. Le poste doit être membre du domaine, les FQDN doivent résoudre vers les bonnes IP et WinRM doit être accessible. Un ping seul ne suffit pas : il ne valide ni WinRM, ni l'identité, ni l'accès SMB.
+Vous devez obtenir `TcpTestSucceeded = True` pour les deux cibles. Si l'un des tests échoue, vérifiez sur la cible le service WinRM et les règles de pare-feu associées à l'administration distante. Gardez le pare-feu actif : cherchez la règle concernée plutôt que désactiver l'ensemble de la protection.
 
-Sur les deux serveurs, le formateur active WinRM en console admin si nécessaire :
-
-```powershell
-# Sur DC01 puis SRV01, en console Windows PowerShell administrateur.
-# Préparer WinRM, le point d'entrée PowerShell et ses règles de pare-feu.
-Enable-PSRemoting -Force
-```
-
-Il vérifie les règles réseau existantes. Le TP conserve Windows Firewall et Defender actifs. Il n'utilise pas TrustedHosts `*`, Basic, AllowUnencrypted ou CredSSP. Kerberos s'utilise avec les **noms DNS**, pas avec les IP des serveurs dans les PSSession.
+Ce test valide le passage TCP, pas encore votre authentification. À l'étape 02, vous ouvrirez une PSSession avec votre compte administratif et **le nom DNS du serveur**. Dans ce laboratoire de domaine, Kerberos utilise ce nom pour identifier la cible ; une adresse IP ne convient pas aux appels Kerberos prévus dans le TP.
 
 ## Emplacement des fichiers et moteur
 
@@ -118,10 +136,12 @@ Si les scripts locaux vérifiés sont bloqués, appliquer la règle de la salle 
 
 Le moteur retenu est **Windows PowerShell 5.1 (`powershell.exe`)**. Les corrections utilisent les modules natifs Windows/AD ; elles ne nécessitent pas de téléchargement de module pendant la séance. Server Core est un mode d'installation de Windows, indépendant de la version de PowerShell. Les scripts fournis sont en UTF-8 avec BOM pour conserver les accents en 5.1.
 
+Avant de lancer les scripts, effectuez le [contrôle syntaxique](../VALIDATION.md#contrôle-syntaxique-non-exécutant) sur ADMIN. Il lit les fichiers sans créer d'objet AD ni modifier de partage. Corrigez les erreurs éventuelles, puis poursuivez avec l'étape 02.
+
 ## Identités et périmètre
 
-Un compte d'administration de laboratoire exécute les créations AD et la configuration du serveur. Il lui faut les droits correspondants sur les deux cibles. Ces droits peuvent être délégués ; le corrigé ne crée aucun administrateur de domaine. Pour la démonstration des accès, on utilise ensuite Alice et Chloé, des comptes ordinaires.
+Utilisez un compte d'administration du laboratoire pour les créations AD et la configuration du serveur. Vérifiez qu'il dispose des droits nécessaires sur les deux cibles ; ces droits peuvent être délégués. Vous saisirez ce compte avec Get-Credential à l'étape 02. Pour démontrer les accès, vous utiliserez ensuite Alice et Chloé, des comptes ordinaires.
 
-Les créations sont prévues dans l'OU `TP-Automatisation` et les dossiers dédiés. Ne pas utiliser de données réelles. Avant la première création, le formateur remet la copie du laboratoire à son état préparé si une séance précédente a déjà utilisé ces noms. Il n'y a pas de script de suppression globale du domaine.
+Les créations sont prévues dans l'OU `TP-Automatisation` et les dossiers dédiés. Utilisez uniquement les données fictives du dépôt. Si votre copie contient déjà les objets d'une séance précédente, retrouvez son état initial avant de commencer une nouvelle séance. En revanche, **pendant le TP**, conservez les objets créés : les étapes suivantes et les tests de relance s'appuient sur cet état.
 
-**Porte de sortie :** les deux serveurs répondent en WinRM Kerberos, le fichier de configuration décrit votre copie isolée de la maquette. Vous pouvez commencer l'automatisation.
+**Vous pouvez passer à l'étape 02 lorsque :** votre copie est isolée, ADMIN est membre du domaine, les deux noms DNS sont résolus, WinRM est démarré et joignable sur les deux cibles, et le JSON décrit votre maquette. Vous vérifierez l'authentification Kerberos en ouvrant les premières sessions à l'étape suivante.

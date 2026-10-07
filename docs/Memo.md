@@ -23,3 +23,7 @@ Avant de modifier : identifier la cible et l'identité, lire le code et tester W
 Dépannage : IP → DNS → port TCP → authentification → service → groupes → ACL. Si le partage autorisé échoue aussi, ne pas interpréter le refus de l'autre comme une réussite de sécurité.
 
 Le JSON contient les noms DNS et l'IP du poste de test. Le vrai NetBIOS est lu sur le DC. Les scripts utilisent des objets ; réserver Format-Table/Format-List à l'affichage final.
+
+Ordre du parcours : vérifier la maquette → inventorier → créer les six comptes/groupes → configurer les deux partages et tester Alice/Chloé → piloter, tester les erreurs et ajouter Gabriel. L'état final comporte sept comptes, quatre groupes et deux partages. La relance finale utilise le CSV à sept ; elle annonce Created=0 et Existing=7.
+
+Gardez une console administrative sur ADMIN pour le déploiement et les variables du TP. Ouvrez une console réseau distincte par identité métier pour les tests ; revenez ensuite à la console administrative.

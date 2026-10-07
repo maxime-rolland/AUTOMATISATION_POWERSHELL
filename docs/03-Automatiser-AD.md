@@ -4,6 +4,8 @@
 
 **Correction : [Lab.Common.ps1](../scripts/Lab.Common.ps1) et [02-Sync-AD.ps1](../scripts/02-Sync-AD.ps1). Le script AD s'exécute sur le DC du domaine existant.**
 
+Commencez sur ADMIN, dans le dépôt `C:\TP-PowerShell`, après l'inventaire de l'étape 02. Conservez la console administrative pour réutiliser `$admin`. Si vous l'avez fermée, ouvrez Windows PowerShell 5.1, revenez dans ce dossier et saisissez de nouveau votre compte avec `$admin = Get-Credential`.
+
 ## Les données pilotent les opérations
 
 Le [CSV](../donnees/utilisateurs.csv) décrit six personnes. Les deux services autorisés proviennent du JSON. Si vous changez le nom d'un serveur dans JSON, les scripts doivent continuer à fonctionner ; si vous ajoutez une personne au CSV, il ne doit pas être nécessaire de dupliquer une ligne de code de création.
@@ -26,7 +28,7 @@ Dans le jeu commun, trois personnes sont dans IT et trois dans RH. `SamAccountNa
 
 ## Valider toutes les lignes avant de modifier AD
 
-Le CSV invalide contient quatre types d'erreur : doublon, caractère interdit dans l'identifiant, service non configuré et prénom manquant. Si vous créez les comptes pendant que vous lisez chaque ligne, la ligne 1 peut être créée avant de découvrir l'erreur de la ligne 4. L'état devient partiel à cause d'une donnée que l'on aurait pu refuser dès le départ.
+Le CSV invalide contient quatre types d'erreur : doublon, caractère interdit dans l'identifiant, service non configuré et prénom manquant. Si vous créez les comptes pendant que vous lisez chaque ligne, le compte de la première personne peut être créé avant de découvrir une erreur plus loin. L'état devient partiel à cause d'une donnée que l'on aurait pu refuser dès le départ.
 
 L'algorithme attendu est : lire **tout** le fichier → accumuler les erreurs → arrêter s'il y en a → appliquer les changements seulement si le fichier entier est valide.
 
@@ -195,6 +197,6 @@ Le GG IT contient trois comptes ; le DL IT contient le GG, et non trois permissi
 2. Tester le fichier invalide sans effectuer de créations.
 3. Déployer les six comptes et quatre groupes ; vérifier OU et appartenances.
 4. Rejouer et montrer zéro nouvelle création, les mêmes comptes et les mêmes groupes.
-5. Préparer l'adaptation commune de l'étape 05 : ajouter `tp.gabriel` (Gabriel Moreau, IT) dans une copie du CSV, puis montrer une seule création supplémentaire. Effectuer cet ajout après la vérification du socle de six comptes.
+5. Conserver le CSV initial de six personnes et les objets créés pour les étapes 04 et 05. Vous ajouterez `tp.gabriel` à l'étape 05, après avoir vérifié les partages et le socle de six comptes.
 
 **Preuves :** données initiales, erreur de validation, sortie WhatIf, premier/deuxième passage et lecture des vrais objets AD. Les captures d'une sortie « terminé » ne remplacent pas ces vérifications.

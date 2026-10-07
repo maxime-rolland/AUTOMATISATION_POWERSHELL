@@ -4,6 +4,10 @@
 
 **Corrections : [03-Sync-Shares.ps1](../scripts/03-Sync-Shares.ps1) et [05-Test-Access.ps1](../scripts/05-Test-Access.ps1).**
 
+Reprenez sur ADMIN après avoir vérifié les six comptes et les quatre groupes de l'étape 03. Gardez votre console administrative d'origine pour `$admin` et les connexions WinRM. Les consoles ouvertes avec `runas /netonly` serviront uniquement aux tests métiers ; fermez-les après chaque identité testée.
+
+Si vous avez fermé la console administrative entre les deux journées, rouvrez Windows PowerShell 5.1 sur ADMIN, placez-vous dans `C:\TP-PowerShell` et resaisissez `$admin = Get-Credential`. Le premier bloc d'appel ci-dessous relira la configuration et le nom NetBIOS ; vous pourrez ensuite ouvrir les consoles métiers avec le secret attribué aux comptes à l'étape 03.
+
 ## Le résultat métier à obtenir
 
 Alice et ses collègues IT ont accès au dossier IT. Chloé et ses collègues RH ont accès à RH. Aucun de ces comptes ne doit accéder au dossier de l'autre service. Les administrateurs peuvent gérer localement les dossiers, mais leurs privilèges ne sont pas utilisés pour faire le test métier.
@@ -125,7 +129,7 @@ Invoke-Command -Session $srv -ArgumentList $remote,$domain.NetBIOSName {
 }
 ```
 
-Faire le vrai passage en rejouant le dernier bloc sans WhatIf. Vérifier sur la cible puis fermer la session :
+Après lecture du plan, exécutez le bloc suivant pour appliquer les droits, vérifier l'état réel sur SRV01 et fermer la session :
 
 ```powershell
 # ADMIN : appliquer réellement le script de partages sur SRV01, sans -WhatIf.
@@ -202,6 +206,8 @@ Set-Location C:\TP-PowerShell
 
 Les résultats doivent être inversés par rapport à Alice.
 
+Fermez ensuite la console de Chloé et revenez à la console administrative d'origine pour poursuivre le TP. Une commande de déploiement doit utiliser le compte d'administration ; une preuve d'accès métier doit utiliser Alice, Chloé ou Gabriel.
+
 | Identité réseau | Partage IT lire/écrire | Partage RH lire/écrire |
 |---|---|---|
 | Alice | autorisé | refusé |
@@ -222,7 +228,6 @@ Si tous les accès échouent, contrôler : nom/IP, port TCP 445, AdminIPAddress 
 1. Construire les deux partages à partir de config.Services, pas avec deux blocs copiés-collés différents.
 2. Expliquer les trois autorisations NTFS et leur héritage.
 3. Tester les quatre combinaisons Alice/Chloé × IT/RH.
-4. Rejouer le script puis vérifier l'absence de doublons dans les ACL et la conservation des tests d'accès.
-5. Si le formateur ajoute une autorisation SMB trop large sur **votre partage de TP**, montrer que la relance la retire.
+4. Rejouer le script puis vérifier l'absence de doublons dans les ACL, la liste SMB attendue et la conservation des quatre tests d'accès.
 
 **Preuves :** liste des vrais partages, droits SMB/NTFS, quatre tests métiers et résultats après relance. Le fonctionnement doit être montré en direct pendant l'évaluation.

@@ -6,11 +6,11 @@
 
 | Critère | Points | Pour obtenir 4 points |
 |---|---|---|
-| 1. Automatisation fonctionnelle | /4 | Une commande lit le CSV, crée/conserve les comptes et groupes, configure les deux partages et rend un rapport utilisable |
-| 2. Relance maîtrisée | /4 | Rejouer sans doublons ni remise à zéro des mots de passe ; les comptes, groupes, partages et accès restent corrects |
-| 3. Droits réellement testés | /4 | Alice IT oui/RH non ; Chloé RH oui/IT non ; tests effectués avec les bonnes identités réseau et serveur joignable |
-| 4. Erreurs et adaptation | /4 | CSV invalide refusé sans ajout, cible inaccessible signalée, reprise correcte et ajout de Gabriel et de ses accès montré |
-| 5. Compréhension individuelle | /4 | Chaque étudiant explique le lieu d'exécution, une condition/boucle, le traitement d'erreur et une limite, puis sait modifier un élément demandé |
+| 1. Automatisation fonctionnelle | /4 | Vous lancez une commande qui lit le CSV, crée/conserve les comptes et groupes, configure les deux partages et rend un rapport utilisable |
+| 2. Relance maîtrisée | /4 | Vous rejouez sans doublons ni remise à zéro des mots de passe ; les comptes, groupes, partages et accès restent corrects |
+| 3. Droits réellement testés | /4 | Vous montrez Alice IT oui/RH non et Chloé RH oui/IT non, avec les bonnes identités réseau et un serveur joignable |
+| 4. Erreurs et adaptation | /4 | Vous montrez les deux erreurs sans ajout, la reprise correcte, puis l'ajout de Gabriel, ses accès et la relance à sept comptes |
+| 5. Compréhension individuelle | /4 | Vous expliquez le lieu d'exécution, une condition/boucle, le traitement d'erreur et une limite ; vous savez retrouver et modifier le bloc concerné |
 | **Total** | **/20** | **Même grille pour tous ; si le TP est fait à deux, les quatre premiers critères sont communs et le cinquième est individuel** |
 
 ## Barème applicable à chaque critère
@@ -25,7 +25,7 @@
 
 Pour les droits, une démonstration uniquement sous administrateur ne prouve pas l'isolation métier. Pour la relance, lire EXISTANT dans le rapport ne remplace pas la vérification des objets. Pour les erreurs, un refus réseau dû à un serveur éteint n'est pas une preuve d'ACL.
 
-L'IA peut écrire ou corriger le code ; cela ne retire pas de point. Un étudiant qui ne peut pas expliquer le code qu'il exécute perd les points correspondant à sa compréhension. Le même socle de six comptes, les mêmes erreurs et le même ajout de Gabriel sont demandés à tous. Aucun outil supplémentaire ni présentation longue n'est nécessaire.
+L'IA peut écrire ou corriger votre code ; cela ne retire pas de point. Les points de compréhension dépendent de votre capacité à expliquer le code que vous exécutez. Vous construisez d'abord le socle de six comptes, puis vous présentez l'état final à sept après l'ajout de Gabriel. Les quatre groupes et les deux partages restent les mêmes. Aucun outil supplémentaire ni présentation longue n'est nécessaire.
 
 ## Fiche de passage
 
