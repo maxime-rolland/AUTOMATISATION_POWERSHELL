@@ -13,4 +13,4 @@
 
 Moteur : Windows PowerShell 5.1 ; scripts UTF-8 avec BOM. Les commentaires expliquent les décisions et les effets ; ils ne dispensent pas de tester sur votre maquette. Le pilote appelle les scripts AD et partages : ne les lancer manuellement que pour comprendre ou diagnostiquer une étape.
 
-Le fichier de configuration et les données sont copiés sur les cibles dans le dossier réservé au LabId. Les corrections sont disponibles dès le début du TP. Réutilisation et IA autorisées ; explication et démonstration obligatoires.
+Le fichier de configuration et les données sont copiés sur les cibles dans `C:\TP-Automatisation\scripts`. Les corrections sont disponibles dès le début du TP. Réutilisation et IA autorisées ; explication et démonstration obligatoires.

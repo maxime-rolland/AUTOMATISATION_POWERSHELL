@@ -3,7 +3,7 @@
 .SYNOPSIS
     Vérifier l'accès SMB avec l'identité réseau de la console courante.
 .DESCRIPTION
-    Lancer dans une console runas /netonly de tp.b01.alice ou tp.b01.chloe.
+    Lancer dans une console runas /netonly de tp.alice ou tp.chloe.
     Le script N'UTILISE PAS une session WinRM administrateur pour tester les droits.
     Il tente de lire puis d'écrire dans chaque partage, et compare au service attendu.
     Ne pas l'appeler dans une console Domain Admin pour évaluer un salarié.
@@ -20,7 +20,7 @@ if ($ExpectedService -cnotin $config.Services) {throw 'Service attendu inconnu.'
 
 # Tester tous les services, pas seulement celui autorisé : il faut aussi prouver le refus.
 foreach ($service in $config.Services) {
-    $root = '\\' + $config.FileServer + '\TP_' + $config.LabId + '_' + $service + '$'
+    $root = '\\' + $config.FileServer + '\TP_' + $service + '$'
     $allowed = ($service -eq $ExpectedService)
     $file = Join-Path $root ('preuve-' + [guid]::NewGuid().ToString('N') + '.txt')
     $canList = $false; $canWrite = $false; $listError=''; $writeError=''

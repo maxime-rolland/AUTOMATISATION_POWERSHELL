@@ -1,5 +1,5 @@
 SamAccountName;Prenom;Nom;Service
-tp.b01.alice;Alice;Martin;IT
-tp.b01.alice;Alice;Martin;IT
-tp.b01.invalide!;Test;Erreur;COM
-tp.b01.sansnom;;Erreur;RH
+tp.alice;Alice;Martin;IT
+tp.alice;Alice;Martin;IT
+tp.invalide!;Test;Erreur;COM
+tp.sansnom;;Erreur;RH

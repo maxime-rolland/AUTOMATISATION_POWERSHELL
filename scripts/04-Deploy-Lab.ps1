@@ -25,13 +25,12 @@ $ErrorActionPreference = 'Stop'
 $config = Read-LabConfig $ConfigPath
 
 # Validation LOCALE intégrale avant toute copie, OU, groupe ou compte créé.
-$prefix = 'tp.' + $config.LabId.ToLowerInvariant() + '.'
-$users = @(Read-ValidatedUsers -Path $CsvPath -AllowedServices $config.Services -AccountPrefix $prefix)
+$users = @(Read-ValidatedUsers -Path $CsvPath -AllowedServices $config.Services)
 if (-not $WhatIfPreference -and -not $InitialPassword) {throw 'Fournir InitialPassword en SecureString.'}
 
 $dcSession = $null
 $fileSession = $null
-$remotePath = "C:\TP-Automatisation\scripts\$($config.LabId)"
+$remotePath = 'C:\TP-Automatisation\scripts'
 try {
     # Les deux connexions et leurs contextes sont validés avant le déploiement.
     $dcSession = New-PSSession -ComputerName $config.DomainController -Credential $Credential `

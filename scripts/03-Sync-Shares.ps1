@@ -29,10 +29,10 @@ $netbios = $NetBIOSName
 
 # Tout résoudre avant les créations limite les modifications partielles si un groupe manque.
 $plans = foreach ($service in $config.Services) {
-    $account = "$netbios\DL_TP_$($config.LabId)_${service}_M"
+    $account = "$netbios\DL_TP_${service}_M"
     $sid = ([System.Security.Principal.NTAccount]$account).Translate([System.Security.Principal.SecurityIdentifier])
-    $path = Join-Path (Join-Path $config.DataRoot $config.LabId) $service
-    $shareName = 'TP_' + $config.LabId + '_' + $service + '$'
+    $path = Join-Path $config.DataRoot $service
+    $shareName = 'TP_' + $service + '$'
     $existing = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
     if ($existing -and $existing.Path -ne $path) {throw "Le partage $shareName pointe ailleurs."}
     [pscustomobject]@{Service=$service;Account=$account;SID=$sid.Value;Path=$path;Share=$shareName}
@@ -82,13 +82,13 @@ foreach ($plan in $plans) {
     [pscustomobject]@{Service=$plan.Service;Share=$plan.Share;Path=$plan.Path;Group=$plan.Account}
 }
 
-$ruleName = 'TP-Auto-SMB-' + $config.LabId
+$ruleName = 'TP-Auto-SMB'
 if ($PSCmdlet.ShouldProcess($ruleName, 'Autoriser SMB depuis le poste de test')) {
     # Les règles SMB Windows générales sont retirées sur ce serveur DÉDIÉ au TP.
     # Cela ne constitue pas une politique globale : d'autres règles/GPO peuvent autoriser 445.
     Get-NetFirewallRule -Name 'FPS-SMB-In-TCP*' -ErrorAction SilentlyContinue | Disable-NetFirewallRule
     if (-not (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)) {
-        New-NetFirewallRule -Name $ruleName -DisplayName "TP automatisation SMB $($config.LabId)" `
+        New-NetFirewallRule -Name $ruleName -DisplayName 'TP automatisation SMB' `
             -Direction Inbound -Protocol TCP -LocalPort 445 -RemoteAddress $config.AdminIPAddress `
             -Action Allow | Out-Null
     } else {

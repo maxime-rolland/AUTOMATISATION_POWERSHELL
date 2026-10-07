@@ -36,7 +36,7 @@ globalement le pare-feu et ne remplace pas l'identité de test par Domain Admin.
 
 ## Vérifier votre compréhension
 
-Le formateur peut demander : « Quelle machine crée le compte ? », « Pourquoi le DL doit-il exister avant l'ACL ? », « Que fait finally ? », « Pourquoi whoami reste-t-il inchangé avec /netonly ? », « Si le CSV change de binôme, quel contrôle le refuse ? », « Que se passe-t-il si l'AD crée un compte désactivé ? ».
+Le formateur peut demander : « Quelle machine crée le compte ? », « Pourquoi le DL doit-il exister avant l'ACL ? », « Que fait finally ? », « Pourquoi whoami reste-t-il inchangé avec /netonly ? », « Quel contrôle refuse un compte sans le préfixe tp. ? », « Que se passe-t-il si l'AD crée un compte désactivé ? ».
 
 La bonne réponse n'est pas la récitation de tout le script. Il faut pouvoir repérer le bloc concerné, expliquer sa décision et montrer le test correspondant.
 

@@ -40,9 +40,6 @@ function Read-LabConfig {
         if ($service -cnotmatch '^[A-Z]{2,12}$') {throw "Service invalide : $service"}
     }
 
-    # B01, B02... évitent les collisions entre binômes partageant le même domaine.
-    if ($config.LabId -cnotmatch '^B[0-9]{2}$') {throw 'LabId doit être B suivi de deux chiffres.'}
-
     # Les ACL seront remplacées sur les dossiers de ce chemin : on borne le périmètre.
     if ($config.DataRoot -ne 'C:\TP-Automatisation\Partages') {
         throw 'DataRoot doit rester C:\TP-Automatisation\Partages pour cette correction.'
@@ -63,8 +60,7 @@ function Read-ValidatedUsers {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Path,
-        [Parameter(Mandatory)][string[]]$AllowedServices,
-        [Parameter(Mandatory)][string]$AccountPrefix
+        [Parameter(Mandatory)][string[]]$AllowedServices
     )
 
     # @() conserve un tableau même si le CSV ne contient qu'une personne.
@@ -78,7 +74,7 @@ function Read-ValidatedUsers {
     if (@(Compare-Object $expected $actual).Count -gt 0) {throw 'En-têtes du CSV incorrects.'}
 
     # Une table de hachage PowerShell est insensible à la casse pour ces clés.
-    # tp.b01.alice et TP.B01.ALICE seront donc reconnus comme le même identifiant.
+    # tp.alice et TP.ALICE seront donc reconnus comme le même identifiant.
     $seen = @{}
     $errors = New-Object 'System.Collections.Generic.List[string]'
 
@@ -87,12 +83,9 @@ function Read-ValidatedUsers {
         $sam = [string]$row.SamAccountName # Une cellule absente devient une chaîne vide à valider.
         $line = $i + 2 # Ligne 1 = en-têtes ; le premier salarié est à la ligne 2.
 
-        # Règle du TP : préfixe du binôme, minuscules, maximum 20 caractères au total.
+        # Règle commune : préfixe tp., minuscules, maximum 20 caractères au total.
         if ($sam -cnotmatch '^tp\.[a-z][a-z0-9.]{0,16}$') {
             $errors.Add("Ligne ${line} : SamAccountName invalide.")
-        }
-        if (-not $sam.StartsWith($AccountPrefix, [System.StringComparison]::Ordinal)) {
-            $errors.Add("Ligne ${line} : préfixe attendu $AccountPrefix")
         }
         if ($seen.ContainsKey($sam)) {
             $errors.Add("Ligne ${line} : identifiant en double.")

@@ -43,6 +43,9 @@ $results = foreach ($computer in $ComputerName) {
                 Domain = $system.Domain
                 OS = $os.Caption
                 Installation = $install.InstallationType
+                # Correction de l'adaptation commune : date de dernier démarrage en ISO 8601.
+                # Lire la propriété sur la cible avant de transmettre l'objet à ADMIN.
+                LastBootUpTime = $os.LastBootUpTime.ToString('o')
                 FreeGB = [math]::Round($disk.FreeSpace / 1GB, 2)
                 State = 'OK'
                 Error = ''
@@ -51,7 +54,8 @@ $results = foreach ($computer in $ComputerName) {
     } catch {
         # L'erreur d'une cible devient une ligne du rapport ; les autres restent traitées.
         [pscustomobject]@{
-            Machine=$computer; Domain=''; OS=''; Installation=''; FreeGB=$null
+            # Garder aussi la nouvelle colonne en cas d'échec, pour un CSV de structure constante.
+            Machine=$computer; Domain=''; OS=''; Installation=''; LastBootUpTime=''; FreeGB=$null
             State='ECHEC'; Error=$_.Exception.Message
         }
     } finally {
@@ -63,6 +67,7 @@ $results = foreach ($computer in $ComputerName) {
 # L'export est LOCAL. Select-Object retire les propriétés ajoutées par le remoting.
 $folder = Split-Path -Parent $OutPath
 if ($folder -and -not (Test-Path -LiteralPath $folder)) {New-Item $folder -ItemType Directory | Out-Null}
-$results | Select-Object Machine,Domain,OS,Installation,FreeGB,State,Error |
+# Inclure la date dans la projection, sinon elle serait absente du fichier malgré sa lecture.
+$results | Select-Object Machine,Domain,OS,Installation,LastBootUpTime,FreeGB,State,Error |
     Export-Csv -LiteralPath $OutPath -NoTypeInformation -Delimiter ';' -Encoding UTF8
 $results # Sortie d'objets utilisable par l'appelant ; aucune Format-Table ici.

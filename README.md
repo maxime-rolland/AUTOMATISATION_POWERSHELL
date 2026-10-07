@@ -8,10 +8,10 @@ Les exercices, explications et corrections sont disponibles ensemble. Lire, réu
 
 ## Le résultat à montrer
 
-Avec les données fournies pour B01 : **six comptes, quatre groupes, deux partages**.
+Avec le même jeu de données pour toute la classe : **six comptes, quatre groupes, deux partages**.
 
-- `tp.b01.alice` peut lire et écrire dans le partage IT, mais ne peut pas accéder à RH.
-- `tp.b01.chloe` peut lire et écrire dans RH, mais ne peut pas accéder à IT.
+- `tp.alice` peut lire et écrire dans le partage IT, mais ne peut pas accéder à RH.
+- `tp.chloe` peut lire et écrire dans RH, mais ne peut pas accéder à IT.
 - Le pilote déploie à partir du CSV ; les rapports sont lisibles.
 - Une relance crée **zéro nouveau compte** et conserve les accès.
 - Un CSV invalide est refusé avant les modifications ; une cible inaccessible produit une erreur compréhensible.
@@ -53,34 +53,46 @@ Les [scripts commentés](scripts/README.md) sont les corrections exécutables. L
 | J2 | 15:20–15:40 | Pause |
 | J2 | 15:40–17:00 | Démonstrations, adaptation courte et explication individuelle |
 
-Pendant le dernier créneau, les binômes passent à tour de rôle ; les autres préparent leurs preuves. Prévoir environ 8 à 10 min par binôme et adapter le passage à l'effectif de la classe.
+Pendant le dernier créneau, les étudiants ou binômes passent à tour de rôle ; les autres préparent leurs preuves. Prévoir environ 8 à 10 min par maquette et adapter le passage à l'effectif de la classe.
 
 ## Démarrage rapide
 
 1. Disposer d'un DC du domaine `learn-it.local`, d'un serveur de fichiers membre et d'un poste d'administration membre. Favoriser **Server Core pour les serveurs**.
 2. Copier ou cloner le dépôt dans `C:\TP-PowerShell` sur le poste d'administration.
-3. Adapter `config/lab.json` : vrais noms des serveurs, IP du poste de test et identifiant de binôme. Adapter les identifiants du CSV si le binôme n'est pas B01.
+3. Vérifier `config/lab.json` : noms des deux serveurs et IP du poste de test. Le CSV, les noms des comptes et les exercices sont les mêmes pour toute la classe.
 4. Ouvrir **Windows PowerShell 5.1**. Pour démarrer avec le corrigé complet :
 
 ```powershell
+# ADMIN : placer la console à la racine du dépôt, pour les chemins relatifs .\scripts.
 Set-Location C:\TP-PowerShell
+
+# Demander le compte administratif ; Get-Credential renvoie un objet PSCredential.
+# Utiliser le vrai nom NetBIOS du domaine ou un UPN, par exemple administrateur@learn-it.local.
 $admin = Get-Credential -Message 'Compte autorisé sur le DC et le serveur de fichiers du TP'
+
+# Lire les informations des deux serveurs et produire resultats\inventaire.csv.
 .\scripts\01-Get-Inventory.ps1 -Credential $admin
+
+# Vérifier les données et connexions ; WhatIf ne copie rien et ne crée aucun objet du TP.
 .\scripts\04-Deploy-Lab.ps1 -Credential $admin -WhatIf
+
+# Saisir un secret conforme à la stratégie du domaine ; ne pas l'écrire en clair.
 $password = Read-Host 'Secret temporaire des comptes fictifs du TP' -AsSecureString
+
+# Exécuter réellement : AD d'abord, puis dossiers/partages, puis rapports locaux.
 .\scripts\04-Deploy-Lab.ps1 -Credential $admin -InitialPassword $password
 ```
 
 Lire les explications avant de lancer le déploiement. Une réponse State=OK n'est pas toute la recette : montrer les accès avec les comptes métiers et la relance. Le secret est saisi, jamais enregistré dans le dépôt. Les comptes fictifs sont directement utilisables pour les tests SMB ; ce choix pédagogique et le secret temporaire commun ne constituent pas un onboarding de production.
 
-## Binômes et domaine partagé
+## Un seul TP pour toute la classe
 
-`LabId=B01` produit une OU `TP-Automatisation-B01`, des comptes `tp.b01.*`, des groupes `GG_TP_B01_*`/`DL_TP_B01_*` et des partages `TP_B01_*`. B02 utilise son propre identifiant et des comptes `tp.b02.*`.
+Chaque étudiant, ou chaque binôme si le travail se fait à deux, reçoit **une copie isolée de la même maquette** : DC01, SRV01 et ADMIN dans `learn-it.local`. Tous utilisent `tp.alice`, `tp.chloe`, les groupes `GG_TP_IT`/`GG_TP_RH` et `DL_TP_IT_M`/`DL_TP_RH_M`, et les partages `TP_IT$`/`TP_RH$`. Il n'y a aucun identifiant de binôme à configurer.
 
-Un domaine peut être partagé par la classe ; affecter **un LabId unique à chaque binôme** et, de préférence, son propre serveur membre. Si les serveurs de fichiers sont aussi partagés, l'enseignant prépare les règles réseau communes ; les scripts de partages modifient les règles SMB locales du laboratoire. Ne pas lancer B01 depuis plusieurs binômes simultanément.
+Le réseau virtuel de chaque copie doit être isolé des autres : des VM portant les mêmes noms et IP ne doivent pas partager le même LAN. Le formateur fournit les VM prêtes et un point de restauration avant les créations du TP. Tous suivent les mêmes étapes, le même ajout final de `tp.gabriel` et la même grille d'évaluation.
 
 ## Livraison et validation
 
 Le dépôt contient les sources Markdown/Mermaid, scripts et jeux de données. Les essais Windows doivent être répétés sur la maquette réelle ; [VALIDATION.md](VALIDATION.md) distingue les contrôles effectués et les vérifications à exécuter. Le TP utilise le domaine existant : il ne le reconstruit pas et ne demande aucun rôle web ni service supplémentaire.
 
-Auteur : Maxime ROLLAND · Pulse myIT. Version 2.0 — 6 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).
+Auteur : Maxime ROLLAND · Pulse myIT. Version 2.1 — 7 octobre 2026. [Documentation officielle](Sources.md) · [Licence MIT](LICENSE).

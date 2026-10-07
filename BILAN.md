@@ -1,6 +1,6 @@
 # Bilan court du TP
 
-Binôme : … · LabId : … · Domaine : learn-it.local · Machines : …
+Étudiant(s) : … · Domaine : learn-it.local · Machines : …
 
 ## Résultat
 

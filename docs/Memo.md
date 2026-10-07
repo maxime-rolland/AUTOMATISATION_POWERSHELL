@@ -22,4 +22,4 @@ Avant de modifier : identifier la cible et l'identité, lire le code et tester W
 
 Dépannage : IP → DNS → port TCP → authentification → service → groupes → ACL. Si le partage autorisé échoue aussi, ne pas interpréter le refus de l'autre comme une réussite de sécurité.
 
-Le JSON contient le nom DNS, le LabId et l'IP du poste de test. Le vrai NetBIOS est lu sur le DC. Les scripts utilisent des objets ; réserver Format-Table/Format-List à l'affichage final.
+Le JSON contient les noms DNS et l'IP du poste de test. Le vrai NetBIOS est lu sur le DC. Les scripts utilisent des objets ; réserver Format-Table/Format-List à l'affichage final.

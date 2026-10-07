@@ -21,13 +21,12 @@ param(
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Lab.Common.ps1')
 $config = Read-LabConfig $ConfigPath
-$prefix = 'tp.' + $config.LabId.ToLowerInvariant() + '.'
-$rows = @(Read-ValidatedUsers -Path $CsvPath -AllowedServices $config.Services -AccountPrefix $prefix)
+$rows = @(Read-ValidatedUsers -Path $CsvPath -AllowedServices $config.Services)
 
 # Lire le vrai domaine fournit son DN et son NetBIOS : on ne devine pas ces valeurs.
 $domain = Get-ADDomain
 if ($domain.DNSRoot -ne $config.DomainName) {throw 'Le serveur appartient à un autre domaine.'}
-$labDN = "OU=TP-Automatisation-$($config.LabId),$($domain.DistinguishedName)"
+$labDN = "OU=TP-Automatisation,$($domain.DistinguishedName)"
 $usersDN = "OU=Utilisateurs,$labDN"
 $groupsDN = "OU=Groupes,$labDN"
 
@@ -42,7 +41,7 @@ foreach ($row in $rows) {
     }
 }
 foreach ($service in $config.Services) {
-    foreach ($group in @(@{Name="GG_TP_$($config.LabId)_$service";Scope='Global'}, @{Name="DL_TP_$($config.LabId)_${service}_M";Scope='DomainLocal'})) {
+    foreach ($group in @(@{Name="GG_TP_$service";Scope='Global'}, @{Name="DL_TP_${service}_M";Scope='DomainLocal'})) {
         $existing = Get-ADGroup -Filter "SamAccountName -eq '$($group.Name)'"
         if ($existing -and ($existing.DistinguishedName -notlike "*,$groupsDN" -or
             $existing.GroupScope -ne $group.Scope -or $existing.GroupCategory -ne 'Security')) {
@@ -54,7 +53,7 @@ if (-not $WhatIfPreference -and -not $InitialPassword) {throw 'Fournir InitialPa
 
 # Une OU existe si son DN complet existe, pas simplement son nom d'affichage.
 $ous = @(
-    @{Name="TP-Automatisation-$($config.LabId)";Path=$domain.DistinguishedName},
+    @{Name="TP-Automatisation";Path=$domain.DistinguishedName},
     @{Name='Utilisateurs';Path=$labDN},
     @{Name='Groupes';Path=$labDN}
 )
@@ -67,10 +66,11 @@ foreach ($ou in $ous) {
     }
 }
 
-# Un groupe global représente le service ; un DL représente l'accès au partage.
+# Noms communs à toute la classe : GG_TP_IT/RH et DL_TP_IT_M/RH_M.
+# Un groupe global rassemble les comptes ; un DL (Domain Local) reçoit les droits.
 foreach ($service in $config.Services) {
-    $global = "GG_TP_$($config.LabId)_$service"
-    $local = "DL_TP_$($config.LabId)_${service}_M"
+    $global = "GG_TP_$service"
+    $local = "DL_TP_${service}_M"
     foreach ($group in @(@{Name=$global;Scope='Global'}, @{Name=$local;Scope='DomainLocal'})) {
         if (-not (Get-ADGroup -Filter "SamAccountName -eq '$($group.Name)'")) {
             if ($PSCmdlet.ShouldProcess($group.Name, 'Créer groupe de sécurité')) {
@@ -114,7 +114,7 @@ foreach ($row in $rows) {
         $state = 'CREE'
     }
     if ($WhatIfPreference) {$state = 'PLANIFIE'} else {
-        $groupName = "GG_TP_$($config.LabId)_$($row.Service)"
+        $groupName = "GG_TP_$($row.Service)"
         $members = @(Get-ADGroupMember $groupName | Select-Object -ExpandProperty SamAccountName)
         if ($row.SamAccountName -notin $members -and $PSCmdlet.ShouldProcess($groupName, "Ajouter $($row.SamAccountName)")) {
             Add-ADGroupMember -Identity $groupName -Members $row.SamAccountName
